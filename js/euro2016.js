@@ -1,8 +1,14 @@
-/** 
+/**
  * Aplicações multimédia - Trabalho Prático 1
  * (c) Catarina Cruz, 2025
- * 
+ * Diogo Trigueiros
+ * João Coelho
+ * Francisco Ribeiro
  */
+
+let firstCard = null;
+let secondCard = null;
+let lockBoard = false;
 
 const game = {}; // encapsula a informação de jogo. Está vazio mas vai-se preenchendo com definições adicionais.
 
@@ -20,7 +26,7 @@ const COLS = 4;
 
 game.sounds = sounds; // Adicionar os sons sons do jogo ao objeto game.
 game.board  = Array(COLS).fill().map(() => Array(ROWS)); // criação do tabuleiro como um array de 6 linhas x 8 colunas
- 
+
 // Representa a imagem de uma carta de um país. Esta definição é apenas um modelo para outros objectos que sejam criados
 // com esta base através de let umaFace = Object.create(face).
 const face = {
@@ -31,7 +37,7 @@ const face = {
 
 const CARDSIZE = 102; 	// tamanho da carta (altura e largura)
 let faces = []; 		// Array que armazena objectos face que contêm posicionamentos da imagem e códigos dos paises
- 
+
 
 window.addEventListener("load", init, false);
 
@@ -41,40 +47,86 @@ function init() {
 	getFaces(); 		// calcular as faces e guardar no array faces
 	createCountries();	// criar países
 	game.sounds.background.play();
-	 
+
 	//completar
 }
 
 // Cria os paises e coloca-os no tabuleiro de jogo(array board[][])
 function createCountries() {
 	/* DICA:
-	Seja umaCarta um elemento DIV, a imagem de carta pode ser obtida nos objetos armazenados no array faces[]; o verso da capa 
+	Seja umaCarta um elemento DIV, a imagem de carta pode ser obtida nos objetos armazenados no array faces[]; o verso da capa
 	está armazenado na ultima posicao do array faces[]. Pode também ser obtido através do seletor de classe .escondida do CSS.
-		umaCarta.classList.add("carta"); 	
+		umaCarta.classList.add("carta");
 		umaCarta.style.backgroundPositionX=faces[0].x;
 		umaCarta.style.backgroundPositionX=faces[0].y;
 
 		Colocar uma carta escondida:
 			umaCarta.classList.add("escondida");
-			
+
 		virar a carta:
 			umaCarta.classList.remove("escondida");
     */
-   
- 
-  
- 
+
+
+
+
+}
+
+function flipCard() {
+    if (lockBoard || this === firstCard || this.classList.contains('igual')) {
+        return;
+    }
+
+    game.sounds.flip.play();
+
+    this.classList.remove('escondida');
+
+    if (!firstCard) {
+        firstCard = this;
+        return;
+    }
+
+    secondCard = this;
+    checkForMatch();
+}
+
+function checkForMatch() {
+    const isMatch = firstCard.dataset.country === secondCard.dataset.country;
+
+    isMatch ? handleMatch() : handleMismatch();
+}
+
+function handleMatch() {
+    game.sounds.success.play();
+    firstCard.classList.add('igual');
+    secondCard.classList.add('igual');
+    resetBoard();
+}
+
+function handleMismatch() {
+    lockBoard = true;
+    setTimeout(() => {
+        game.sounds.hide.play();
+        firstCard.classList.add('escondida');
+        secondCard.classList.add('escondida');
+        resetBoard();
+    }, 500);
+}
+
+function resetBoard() {
+    [firstCard, secondCard] = [null, null];
+    lockBoard = false;
 }
 
 // Adicionar as cartas do tabuleiro à stage
 function render() {
-	 
+
 }
 
 
 // baralha as cartas no tabuleiro
 function scramble() {
- 
+
 }
 
 function exemplo (){
@@ -88,7 +140,7 @@ function exemplo (){
   umaFace.novaProp="asdasd"
 }
 
- 
+
 function tempo() {
   let contador=0;
   let maxCount=60;
@@ -100,16 +152,16 @@ function tempo() {
 	if(contador===maxCount){
 		clearInterval(timeHandler);
 		document.getElementById("time").classList.remove("warning");
-	} 
+	}
   },1)
 
 }
 
 
-/* ------------------------------------------------------------------------------------------------  
+/* ------------------------------------------------------------------------------------------------
  ** /!\ NÃO MODIFICAR ESTAS FUNÇÕES /!\
 -------------------------------------------------------------------------------------------------- */
- 
+
 // configuração do audio
 function setupAudio() {
 	game.sounds.background = document.querySelector("#backgroundSnd");
@@ -144,6 +196,7 @@ function getFaces() {
 	}
 }
 
-/* ------------------------------------------------------------------------------------------------  
+/* ------------------------------------------------------------------------------------------------
  ** /!\ NÃO MODIFICAR ESTAS FUNÇÕES /!\
 -------------------------------------------------------------------------------------------------- */
+
