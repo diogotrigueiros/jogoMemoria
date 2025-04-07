@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+     
+    <meta charset="UTF-8" />
+    <title>Euro2016</title>
+	<link rel="stylesheet" href="css/euro2016.css"/>
+    <script src="euro2016.js"></script>
+   
+  </head>
+  <body>
+  <span id="loadInfo" class="visible"></span> 
+  <div id="container">
+    <div id="stage" width="410" height="410">
+
+    </div>
+  </div>
+	<audio id="backgroundSnd" loop volume="0.1"><source src="sounds/euro2016.mp3" type="audio/mp3"></audio>
+	<audio id="hideSnd" ><source src="sounds/esconder.mp3" type="audio/mp3"></audio>
+	<audio id="goalSnd"><source src="sounds/golo.mp3" type="audio/mp3"></audio>
+	<audio id="successSnd"><source src="sounds/sucesso.mp3" type="audio/mp3"></audio>
+	<audio id="flipSnd"><source src="sounds/virar.mp3" type="audio/mp3"></audio>
+  
+  <progress id="time"  max="45" value="10"></progress>
+  <!-- ao variar o atributo value mexe-se na barra de progresso -->
+ </html>

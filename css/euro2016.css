@@ -1,0 +1,78 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #FFFFFF;
+    z-index: 20;
+    background: url(../images/background.png);
+}
+/*Tabuleiro de jogo (board)*/
+#tabuleiro {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    cursor: pointer;
+}
+
+/*Contentor*/
+#container {
+    position: relative;
+    padding: 0;
+    top: 20px;
+    margin: auto;
+    width: 410px;
+    height: 410px;
+    display: block;
+    border: 10px #1F4952 solid;
+    border-radius: 2%;
+    box-shadow: 4px 4px 4px #1E7179;
+    background-color: #2D5A63;
+}
+
+/*Define uma cara*/
+.carta{
+    display:block;
+    height: 102px;
+    width: 102px;
+    background-image: url(../assets/oitavos.png);
+    position:absolute;
+    cursor: pointer;
+}
+
+/*classe que mostra a carta virada ao contrario*/
+.escondida{
+    background-position: -209px -209px !important;
+}
+
+/*Classe que anima as cartas quando existe uma correspondencia*/
+.matched{
+    animation: matchKF alternate 0.1s;
+}
+
+@keyframes matchKF{
+    from{ transform: scale(0);}
+    to{ transform: scale(1.1);}
+}
+
+.hidden {
+    display: none;
+}
+
+/*Formatação da progress bar*/
+#time{
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    color: blue;
+    border: none;
+}
+/* classe que anima a progress bar quando é adicionada à sua lista de classes*/
+.warning{
+    animation:wa alternate 1s infinite;
+}
+
+@keyframes wa{
+    from{background-color: blue;}
+    from{background-color:red;}
+}
+
+
