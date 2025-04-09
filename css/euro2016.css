@@ -19,22 +19,29 @@ body {
     padding: 0;
     top: 20px;
     margin: auto;
-    width: 410px;
-    height: 410px;
+    width: 450px;
+    height: 450px;
     display: block;
     border: 10px #1F4952 solid;
     border-radius: 2%;
     box-shadow: 4px 4px 4px #1E7179;
     background-color: #2D5A63;
 }
+#stage {
+    display: grid;
+    grid-template-columns: repeat(4, 102px);
+    grid-template-rows: repeat(4, 102px);
+    gap: 10px;
+    justify-content: center;
+    margin: 0 auto;
+}
 
 /*Define uma cara*/
 .carta{
-    display:block;
     height: 102px;
     width: 102px;
     background-image: url(../assets/oitavos.png);
-    position:absolute;
+    transition: all 0.5s;
     cursor: pointer;
 }
 

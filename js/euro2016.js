@@ -46,9 +46,12 @@ function init() {
 	setupAudio(); 		// configurar o audio
 	getFaces(); 		// calcular as faces e guardar no array faces
 	createCountries();	// criar países
+	tempo();			// iniciar o temporizador
+	game.sounds.background.loop = true; // repetir o som de fundo
 	game.sounds.background.play();
 
 	//completar
+
 }
 
 // Cria os paises e coloca-os no tabuleiro de jogo(array board[][])
@@ -66,20 +69,62 @@ function createCountries() {
 		virar a carta:
 			umaCarta.classList.remove("escondida");
     */
+	let cardFaces =[];
+	// Cria o pares das cartas
+	for(let i = 0; i < 8 ; i++){
+		// Cria duas faces para cada país
+		let face1 = Object.create(face);
+        face1.country = faces[i].country;
+        face1.x = faces[i].x;
+        face1.y = faces[i].y;
 
+        let face2 = Object.create(face);
+        face2.country = faces[i].country;
+        face2.x = faces[i].x;
+        face2.y = faces[i].y;
 
+        cardFaces.push(face1);
+        cardFaces.push(face2);
+	}
+	scramble(cardFaces);
 
+	//Faz clear na board antes de adicionar as cartas
+	for(let row = 0; row < ROWS; row++) {
+        for(let col = 0; col < COLS; col++) {
+            game.board[row][col] = null;
+        }
+    }
 
+	cardFaces.forEach((face, index) => {
+        let card = document.createElement("div");
+        card.classList.add("carta", "escondida");
+
+        card.dataset.faceX = face.x;
+        card.dataset.faceY = face.y;
+        card.dataset.country = face.country;
+
+		card.addEventListener("click", flipCard);
+
+        const row = Math.floor(index / COLS);
+        const col = index % COLS;
+        game.board[row][col] = card;
+    });
+	render();
 }
 
 function flipCard() {
-    if (lockBoard || this === firstCard || this.classList.contains('igual')) {
+	if (lockBoard || this === firstCard || this.classList.contains('igual')) {
         return;
     }
 
     game.sounds.flip.play();
 
+
     this.classList.remove('escondida');
+
+
+    this.style.backgroundPositionX = this.dataset.faceX;
+    this.style.backgroundPositionY = this.dataset.faceY;
 
     if (!firstCard) {
         firstCard = this;
@@ -107,8 +152,15 @@ function handleMismatch() {
     lockBoard = true;
     setTimeout(() => {
         game.sounds.hide.play();
+
         firstCard.classList.add('escondida');
         secondCard.classList.add('escondida');
+
+        firstCard.style.backgroundPositionX = '';
+        firstCard.style.backgroundPositionY = '';
+        secondCard.style.backgroundPositionX = '';
+        secondCard.style.backgroundPositionY = '';
+
         resetBoard();
     }, 500);
 }
@@ -120,25 +172,61 @@ function resetBoard() {
 
 // Adicionar as cartas do tabuleiro à stage
 function render() {
+	game.stage.innerHTML = ""; // Limpar o tabuleiro
+
+	const gridStyle = `
+        display: grid;
+        grid-template-columns: repeat(${COLS}, ${CARDSIZE}px);
+        grid-template-rows: repeat(${ROWS}, ${CARDSIZE}px);
+        gap: 10px;
+    `;
+
+	game.stage.style = gridStyle;
+	const cards = game.board.flat().filter(card => card);
+
+    cards.forEach((card, index) => {
+		card.style.position = "relative";
+        card.style.order = index;
+        game.stage.appendChild(card);
+    });
 
 }
 
 
 // baralha as cartas no tabuleiro
-function scramble() {
+function scramble(array) {
+    if (array && Array.isArray(array)) {
+        // Algoritmo de Fisher-Yates para embaralhar o array
+		// https://raullesteves.medium.com/algoritmo-de-fisher-yates-para-embaralhamento-de-arrays-ba13a0542e88
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+    // Aqui é quando é chamados sem parametros
+    else {
+        let cards = Array.from(document.querySelectorAll(".carta"));
+        for (let i = cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            cards[i].style.order = j;
+            cards[j].style.order = i;
+        }
+    }
+
 
 }
 
-function exemplo (){
-  let o1={id:1, pos:{x:10,y:20}}
-  let o2={id:2, pos:{x:1,y:2}}
-  let aux=Object.assign({},o1);
+// function exemplo (){
+//   let o1={id:1, pos:{x:10,y:20}}
+//   let o2={id:2, pos:{x:1,y:2}}
+//   let aux=Object.assign({},o1);
 
-  o1.pos=Object.assign({},o2.pos)
+//   o1.pos=Object.assign({},o2.pos)
 
-  let umaFace= Object.create(face);
-  umaFace.novaProp="asdasd"
-}
+//   let umaFace= Object.create(face);
+//   umaFace.novaProp="asdasd"
+// }
 
 
 function tempo() {
