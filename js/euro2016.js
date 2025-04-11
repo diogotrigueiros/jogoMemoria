@@ -6,11 +6,16 @@
  * Francisco Ribeiro
  */
 
+const game = {}; // encapsula a informação de jogo. Está vazio mas vai-se preenchendo com definições adicionais.
+
 let firstCard = null;
 let secondCard = null;
 let lockBoard = false;
+let contador = 0;
+let maxCount = 60;
+let timeHandler = null;
+game.timerStarted = false;
 
-const game = {}; // encapsula a informação de jogo. Está vazio mas vai-se preenchendo com definições adicionais.
 
 // sons do jogo
 const sounds = {
@@ -46,7 +51,6 @@ function init() {
 	setupAudio(); 		// configurar o audio
 	getFaces(); 		// calcular as faces e guardar no array faces
 	createCountries();	// criar países
-	tempo();			// iniciar o temporizador
 	game.sounds.background.loop = true; // repetir o som de fundo
 	game.sounds.background.play();
 
@@ -117,6 +121,11 @@ function flipCard() {
         return;
     }
 
+    if (!game.timerStarted) {
+        tempo();
+        game.timerStarted = true;
+    }
+
     game.sounds.flip.play();
 
 
@@ -145,6 +154,12 @@ function handleMatch() {
     game.sounds.success.play();
     firstCard.classList.add('igual');
     secondCard.classList.add('igual');
+
+    const timeElem = document.getElementById("time");
+    contador = Math.max(0, contador - 5);
+    if (timeElem) timeElem.value = contador;
+
+
     resetBoard();
 }
 
@@ -230,18 +245,22 @@ function scramble(array) {
 
 
 function tempo() {
-  let contador=0;
-  let maxCount=60;
+  contador=0;
+    const timeElem = document.getElementById("time");
+    if (timeElem) timeElem.value = contador;
 
-  let timeHandler= setInterval(()=>{
+  timeHandler= setInterval(()=>{
 	contador++;
-	document.getElementById("time").value=contador;
-	if(contador===maxCount-5)document.getElementById("time").classList.add("warning");
-	if(contador===maxCount){
+	if (timeElem) {
+        timeElem.value = contador;
+	if(contador>=maxCount-5)document.getElementById("time").classList.add("warning");
+	if(contador>=maxCount){
 		clearInterval(timeHandler);
 		document.getElementById("time").classList.remove("warning");
+        resetGame();
 	}
-  },1)
+    }
+  },1000)
 
 }
 
@@ -288,3 +307,17 @@ function getFaces() {
  ** /!\ NÃO MODIFICAR ESTAS FUNÇÕES /!\
 -------------------------------------------------------------------------------------------------- */
 
+function resetGame() {
+    game.stage.innerHTML = "";
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
+
+    if (timeHandler) clearInterval(timeHandler);
+    game.timerStarted = false;
+    contador = 0;
+    document.getElementById("time").value = 0;
+    document.getElementById("time").classList.remove("warning");
+
+    createCountries();
+}
