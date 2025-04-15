@@ -1,85 +1,165 @@
 body {
-    margin: 0;
-    padding: 0;
-    background-color: #FFFFFF;
-    z-index: 20;
-    background: url(../images/background.png);
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  z-index: 20;
+  font-family: "Arial", sans-serif;
+  background: url(../images/background.png);
 }
 /*Tabuleiro de jogo (board)*/
 #tabuleiro {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    cursor: pointer;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  cursor: pointer;
 }
 
 /*Contentor*/
 #container {
-    position: relative;
-    padding: 0;
-    top: 20px;
-    margin: auto;
-    width: 450px;
-    height: 450px;
-    display: block;
-    border: 10px #1F4952 solid;
-    border-radius: 2%;
-    box-shadow: 4px 4px 4px #1E7179;
-    background-color: #2D5A63;
+  position: relative;
+  padding: 0;
+  top: 20px;
+  margin: auto;
+  width: 450px;
+  height: 450px;
+  display: block;
+  border: 10px #1f4952 solid;
+  border-radius: 2%;
+  box-shadow: 4px 4px 4px #1e7179;
+  background-color: #2d5a63;
 }
 #stage {
-    display: grid;
-    grid-template-columns: repeat(4, 102px);
-    grid-template-rows: repeat(4, 102px);
-    gap: 10px;
-    justify-content: center;
-    margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 102px);
+  grid-template-rows: repeat(4, 102px);
+  gap: 10px;
+  justify-content: center;
+  margin: 0 auto;
+}
+#output {
+  position: relative;
+  width: 90%;
+  margin: 15px auto;
+  margin-top: 20px;
+  padding: 12px 18px;
+  background-color: rgba(31, 73, 82, 0.85);
+  color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+#output::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to right, #2d5a63, #4a97a3, #2d5a63);
+  border-radius: 8px 8px 0 0;
 }
 
+/* Special styling for win messages */
+#output.win-message {
+  background-color: rgba(38, 120, 113, 0.9);
+  color: #ffffff;
+  animation: pulse 2s infinite;
+}
+h1,
+h2 {
+  text-align: center;
+  color: #1f4952;
+  margin: 0;
+  padding: 0;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 10;
+}
+
+h1 {
+  font-size: 2.8rem;
+  margin-top: 20px;
+  font-weight: 900;
+  text-transform: uppercase;
+  background-clip: text;
+  margin-bottom: 5px;
+}
+
+h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  font-style: italic;
+}
 /*Define uma cara*/
-.carta{
-    height: 102px;
-    width: 102px;
-    background-image: url(../assets/oitavos.png);
-    transition: all 0.5s;
-    cursor: pointer;
+.carta {
+  height: 102px;
+  width: 102px;
+  background-image: url(../assets/oitavos.png);
+  cursor: pointer;
+  transition: transform 0.5s ease, order 0.5s ease;
+}
+.shuffling {
+  animation: 1.5s infinite ease-in-out;
 }
 
 /*classe que mostra a carta virada ao contrario*/
-.escondida{
-    background-position: -209px -209px !important;
+.escondida {
+  background-position: -209px -209px !important;
 }
 
 /*Classe que anima as cartas quando existe uma correspondencia*/
-.matched{
-    animation: matchKF alternate 0.1s;
+.matched {
+  animation: matchKF alternate 0.1s;
 }
 
-@keyframes matchKF{
-    from{ transform: scale(0);}
-    to{ transform: scale(1.1);}
+@keyframes matchKF {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1.1);
+  }
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 /*Formatação da progress bar*/
-#time{
-    position: fixed;
-    bottom: 0px;
-    width: 100%;
-    color: blue;
-    border: none;
+#time {
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+  color: blue;
+  border: none;
 }
 /* classe que anima a progress bar quando é adicionada à sua lista de classes*/
-.warning{
-    animation:wa alternate 1s infinite;
+.warning {
+  animation: wa alternate 1s infinite;
+}
+#progressStatus {
+  position: fixed;
+  bottom: 20px; /* Position just above the progress bar */
+  left: 0;
+  width: 100%;
+  text-align: center;
+  padding: 5px 0;
+  font-weight: bold;
+  margin: 5px 0;
+  height: 20px;
+  transition: all 0.3s ease;
 }
 
-@keyframes wa{
-    from{background-color: blue;}
-    from{background-color:red;}
+@keyframes wa {
+  from {
+    background-color: blue;
+  }
+  from {
+    background-color: red;
+  }
 }
-
-

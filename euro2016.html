@@ -10,10 +10,13 @@
   </head>
   <body>
   <span id="loadInfo" class="visible"></span>
+  <h1>Euro2016</h1>
+  <h2>Jogo da Memória</h2>
   <div id="container">
     <div id="stage" width="410" height="410">
 
     </div>
+    <p id="output"></p>
   </div>
 	<audio id="backgroundSnd" loop volume="0.1"><source src="sounds/euro2016.mp3" type="audio/mp3"></audio>
 	<audio id="hideSnd" ><source src="sounds/esconder.mp3" type="audio/mp3"></audio>
@@ -21,6 +24,7 @@
 	<audio id="successSnd"><source src="sounds/sucesso.mp3" type="audio/mp3"></audio>
 	<audio id="flipSnd"><source src="sounds/virar.mp3" type="audio/mp3"></audio>
 
-  <progress id="time"  max="45" value="10"></progress>
+  <p id="progressStatus"></p>
+  <progress id="time"  max="45" value="0"></progress>
   <!-- ao variar o atributo value mexe-se na barra de progresso -->
  </html>
