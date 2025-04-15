@@ -14,7 +14,7 @@ let lockBoard = false;
 let contador = 0;
 let matchedPairs = 0;
 let maxCount = 45;
-let timeHandler = null;
+let timeHandler;
 let output;
 game.timerStarted = false;
 
@@ -178,11 +178,38 @@ function updateOutput() {
   output.textContent = `Tempo restante: ${timeRemaining} segundos | Pares encontrados: ${matchedPairs}/8`;
 }
 
+function checkWinCondition() {
+    // Verifica se todos os pares foram encontrados (considerando 8 pares de cartas)
+    if (matchedPairs === 8) {
+      // Para o temporizador
+      if (timeHandler) {
+        clearInterval(timeHandler); // Certifique-se de que o timer é parado
+      }
+
+      // Toca o som de vitória
+      game.sounds.win.play();
+
+      // Exibe a mensagem de vitória
+      output.textContent = "Parabéns! Encontraste todos os pares!!";
+
+      // Bloqueia o tabuleiro para impedir mais interações
+      lockBoard = true;
+
+      // Opcional: Adicionar uma lógica para mostrar a pontuação ou tempo restante
+      // Exemplo: Se o tempo restante for maior que 0, mostra o tempo que sobrou
+      if (contador > 0) {
+        output.textContent += ` E ainda tens ${contador} segundos!`;
+      }
+    }
+  }
+
+
+
 // Esat função é chamada quando o utilizador clica numa carta
 function flipCard() {
-  if (lockBoard || this === firstCard || this.classList.contains("igual")) {
-    return;
-  }
+    if (lockBoard || this === firstCard || this.classList.contains("igual") || contador >= maxCount) {
+        return;
+    }
 
   if (!game.timerStarted) {
     tempo();
@@ -223,11 +250,7 @@ function handleMatch() {
   // Da update ao output
   updateOutput();
   // Verifica se todos os pares foram encontrados e manda uma mensagem ao utilizador
-  if (matchedPairs === 8) {
-    clearInterval(timeHandler);
-    game.sounds.win.play();
-    output.textContent = "Parabéns! Encontraste todos os pares!!";
-  }
+  checkWinCondition();
   resetBoard();
 }
 
@@ -307,78 +330,113 @@ function scramble(array) {
 
 // Função que baralha as cartas que não foram encontradas
 function reScrambleCards() {
-  // Temporariamente mostra as cartas que não encontradas
-  const unmatched = document.querySelectorAll(".carta:not(.igual)");
+    // Seleciona apenas as cartas que não foram encontradas (não possuem a classe "igual")
+    const unmatched = document.querySelectorAll(".carta:not(.igual)");
 
-  // Mostra as cartas que não foram encontradas
-  unmatched.forEach((card) => {
-    card.classList.remove("escondida");
-    card.style.backgroundPositionX = card.dataset.faceX;
-    card.style.backgroundPositionY = card.dataset.faceY;
-  });
+    // Mostra temporariamente as cartas que não foram encontradas
+    unmatched.forEach((card) => {
+      card.classList.remove("escondida");
+      card.style.backgroundPositionX = card.dataset.faceX;
+      card.style.backgroundPositionY = card.dataset.faceY;
+    });
 
-  // Adicionar classe para animação de embaralhar
-  unmatched.forEach((card) => {
-    card.classList.add("shuffling");
-  });
+    // Adiciona a classe para animação de embaralhamento
+    unmatched.forEach((card) => {
+      card.classList.add("shuffling");
+    });
 
-  output.textContent = "A baralhar as cartas...";
+    output.textContent = "A baralhar as cartas...";
 
-  // Pausa temporariamente o jogo enquanto as cartas são embaralhadas
-  lockBoard = true;
+    // Pausa temporariamente o jogo enquanto as cartas são embaralhadas
+    lockBoard = true;
 
-  // Baralhar
-  let shuffleCount = 0;
-  const maxShuffles = 3;
-  const shuffleInterval = setInterval(() => {
-    // Baralhar apenas as cartas não encontradas
-    const unmatchedCards = Array.from(
-      document.querySelectorAll(".carta:not(.igual)")
-    );
+    // Variáveis para controlar o número de embaralhamentos
+    let shuffleCount = 0;
+    const maxShuffles = 3;
 
-    // Usar o algoritmo Fisher-Yates apenas nas cartas não encontradas
-    for (let i = unmatchedCards.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const tempOrderI = unmatchedCards[i].style.order;
-      const tempOrderJ = unmatchedCards[j].style.order;
+    // Intervalo para embaralhar as cartas várias vezes
+    const shuffleInterval = setInterval(() => {
+      // Seleciona novamente apenas as cartas não encontradas
+      const unmatchedCards = Array.from(
+        document.querySelectorAll(".carta:not(.igual)")
+      );
 
-      setTimeout(() => {
-        unmatchedCards[i].style.order = tempOrderJ;
-        unmatchedCards[j].style.order = tempOrderI;
-      }, 50);
-    }
+      // Algoritmo de Fisher-Yates para embaralhar as cartas não encontradas
+      for (let i = unmatchedCards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tempOrderI = unmatchedCards[i].style.order;
+        const tempOrderJ = unmatchedCards[j].style.order;
 
-    shuffleCount++;
+        // Troca as posições das cartas
+        setTimeout(() => {
+          unmatchedCards[i].style.order = tempOrderJ;
+          unmatchedCards[j].style.order = tempOrderI;
+        }, 50);
+      }
 
-    if (shuffleCount >= maxShuffles) {
-      clearInterval(shuffleInterval);
+      shuffleCount++;
 
-      // Remove a classe que anima as cartas
-      unmatched.forEach((card) => {
-        card.classList.remove("shuffling");
-      });
+      // Verifica se o número máximo de embaralhamentos foi atingido
+      if (shuffleCount >= maxShuffles) {
+        clearInterval(shuffleInterval);
 
-      // Esconde novamente as cartas não encontradas após baralhar
-      setTimeout(() => {
+        // Remove a animação de embaralhamento
         unmatched.forEach((card) => {
-          card.classList.add("escondida");
-          card.style.backgroundPositionX = "";
-          card.style.backgroundPositionY = "";
+          card.classList.remove("shuffling");
         });
 
-        // Reativa o jogo
-        lockBoard = false;
+        // Esconde novamente as cartas não encontradas após um pequeno delay
+        setTimeout(() => {
+          unmatched.forEach((card) => {
+            card.classList.add("escondida");
+            card.style.backgroundPositionX = "";
+            card.style.backgroundPositionY = "";
+          });
 
-        // Reseta as cartas selecionadas
-        firstCard = null;
-        secondCard = null;
+          // 🧼 LIMPAR O ESTADO: Resetar visualmente o tabuleiro e logicamente
+          firstCard = null;
+          secondCard = null;
 
-        // Atualiza a mensagem
-        updateOutput();
-      }, 800);
+          // 💡 CRUCIAL: Re-renderizar todas as cartas para atualizar a estrutura DOM
+          render();
+
+          // 🔧 MODIFICAÇÃO: Reinicia o tempo após reembaralhar
+          console.log("contador antes do reset:", contador);
+          contador = 0;
+          if (timeHandler) clearInterval(timeHandler);
+          tempo(); // Reiniciar o temporizador para dar mais 45 segundos
+
+          lockBoard = false;
+          updateOutput();
+          checkWinCondition();  // Verifica se o jogador venceu após a reembaralhamento
+        }, 800);
+      }
+    }, 50);
+  }
+
+
+function handleCardClick(card) {
+    console.log("Card clicked:", card);
+    console.log("lockBoard:", lockBoard);
+    if (lockBoard) {
+        console.log("Board is locked, ignoring click.");
+        return;
     }
-  }, 800);
+
+    if (!firstCard) {
+        firstCard = card;
+        card.classList.add("flip");
+    } else if (firstCard && firstCard !== card && !secondCard) {
+        secondCard = card;
+        card.classList.add("flip");
+    }
 }
+
+document.querySelectorAll('.carta').forEach((card) => {
+  card.addEventListener('click', () => handleCardClick(card));
+});
+
+
 
 // function exemplo (){
 //   let o1={id:1, pos:{x:10,y:20}}
@@ -393,7 +451,6 @@ function reScrambleCards() {
 
 function tempo() {
   contador = 0;
-  matchedPairs = 0;
   const timeElem = document.getElementById("time");
   const progressStatus = document.getElementById("progressStatus");
   if (timeElem) timeElem.value = contador;
@@ -419,12 +476,13 @@ function tempo() {
             "⚠️ Atenção! Cartas serão baralhadas em 5 segundos! ⚠️";
         }
       }
-      // Clear the warning after shuffling happens
+      // Limpar aviso depois de baralhar
       if (contador >= maxCount) {
         clearInterval(timeHandler);
+        lockBoard = true;
         progressStatus.textContent = "";
+        output.textContent = "⏰ Tempo esgotado! Prime espaço para jogar de novo.";
         document.getElementById("time").classList.remove("warning");
-        resetGame();
       }
     }
   }, 1000);
@@ -485,3 +543,6 @@ function resetGame() {
 
   createCountries();
 }
+
+
+
