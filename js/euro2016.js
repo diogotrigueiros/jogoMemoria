@@ -8,6 +8,7 @@
 
 const game = {}; // encapsula a informação de jogo. Está vazio mas vai-se preenchendo com definições adicionais.
 
+/// variaveis globais
 let firstCard = null;
 let secondCard = null;
 let lockBoard = false;
@@ -194,12 +195,6 @@ function checkWinCondition() {
 
       // Bloqueia o tabuleiro para impedir mais interações
       lockBoard = true;
-
-      // Opcional: Adicionar uma lógica para mostrar a pontuação ou tempo restante
-      // Exemplo: Se o tempo restante for maior que 0, mostra o tempo que sobrou
-      if (contador > 0) {
-        output.textContent += ` E ainda tens ${contador} segundos!`;
-      }
     }
   }
 
@@ -207,28 +202,30 @@ function checkWinCondition() {
 
 // Esat função é chamada quando o utilizador clica numa carta
 function flipCard() {
+  // faz verificações
     if (lockBoard || this === firstCard || this.classList.contains("igual") || contador >= maxCount) {
         return;
     }
-
+/// inicializa o tempo
   if (!game.timerStarted) {
     tempo();
     game.timerStarted = true;
   }
 
   game.sounds.flip.play();
-
+  //muda o atributo da carta para a mesma ficar visivel
   this.classList.remove("escondida");
-
+  //mostra a carta
   this.style.backgroundPositionX = this.dataset.faceX;
   this.style.backgroundPositionY = this.dataset.faceY;
-
+  //lembra a primeira carta selecionada e retorna
   if (!firstCard) {
     firstCard = this;
     return;
   }
-
+  //lembra a segunda carta selecionada
   secondCard = this;
+  //Verifica se as cartas estão paired
   checkForMatch();
 }
 
@@ -256,18 +253,19 @@ function handleMatch() {
 
 // Função que é chamada quando o utilizador não forma um par
 function handleMismatch() {
+  /// inicializa o jogo e os efeitos de som
   lockBoard = true;
   setTimeout(() => {
     game.sounds.hide.play();
-
+//adiciona a classe escondida
     firstCard.classList.add("escondida");
     secondCard.classList.add("escondida");
-
+// dá reset no background
     firstCard.style.backgroundPositionX = "";
     firstCard.style.backgroundPositionY = "";
     secondCard.style.backgroundPositionX = "";
     secondCard.style.backgroundPositionY = "";
-
+// faz reset à board com o delay
     resetBoard();
   }, 500);
 }
@@ -316,7 +314,6 @@ function scramble(array) {
     let cards = Array.from(document.querySelectorAll(".carta"));
     for (let i = cards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      // Use more expressive transitions with random offsets for visual effect
       const tempOrderI = cards[i].style.order;
       const tempOrderJ = cards[j].style.order;
 
@@ -393,14 +390,14 @@ function reScrambleCards() {
             card.style.backgroundPositionY = "";
           });
 
-          // 🧼 LIMPAR O ESTADO: Resetar visualmente o tabuleiro e logicamente
+          //  Resetar visualmente o tabuleiro e logicamente
           firstCard = null;
           secondCard = null;
 
-          // 💡 CRUCIAL: Re-renderizar todas as cartas para atualizar a estrutura DOM
+          // Re-renderiza todas as cartas para atualizar a estrutura DOM
           render();
 
-          // 🔧 MODIFICAÇÃO: Reinicia o tempo após reembaralhar
+          // Reinicia o tempo após reembaralhar, debug
           console.log("contador antes do reset:", contador);
           contador = 0;
           if (timeHandler) clearInterval(timeHandler);
@@ -416,17 +413,21 @@ function reScrambleCards() {
 
 
 function handleCardClick(card) {
+  //debug
     console.log("Card clicked:", card);
     console.log("lockBoard:", lockBoard);
+    // se a board estiver trancada, não aceita cliques
     if (lockBoard) {
         console.log("Board is locked, ignoring click.");
         return;
     }
-
+// armazena a primeira carta
     if (!firstCard) {
         firstCard = card;
         card.classList.add("flip");
+        //faz verificações
     } else if (firstCard && firstCard !== card && !secondCard) {
+      //armazena a segunda carta
         secondCard = card;
         card.classList.add("flip");
     }
@@ -473,7 +474,7 @@ function tempo() {
       if (contador % 45 === 40) {
         if (progressStatus) {
           progressStatus.textContent =
-            "⚠️ Atenção! Cartas serão baralhadas em 5 segundos! ⚠️";
+            " Atenção! Cartas serão baralhadas em 5 segundos! ";
         }
       }
       // Limpar aviso depois de baralhar
@@ -481,7 +482,7 @@ function tempo() {
         clearInterval(timeHandler);
         lockBoard = true;
         progressStatus.textContent = "";
-        output.textContent = "⏰ Tempo esgotado! Prime espaço para jogar de novo.";
+        output.textContent = "Tempo esgotado! Prime espaço para jogar de novo.";
         document.getElementById("time").classList.remove("warning");
       }
     }
@@ -530,17 +531,19 @@ function getFaces() {
 -------------------------------------------------------------------------------------------------- */
 
 function resetGame() {
+///limpa a board
   game.stage.innerHTML = "";
+/// dá reset nas variaveis
   firstCard = null;
   secondCard = null;
   lockBoard = false;
-
+/// para o tempo
   if (timeHandler) clearInterval(timeHandler);
   game.timerStarted = false;
   contador = 0;
   document.getElementById("time").value = 0;
   document.getElementById("time").classList.remove("warning");
-
+/// cria novos paises / cartas
   createCountries();
 }
 
